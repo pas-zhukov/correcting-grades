@@ -5,6 +5,7 @@ from datacenter.models import Schoolkid, Mark, Chastisement, Subject, Commendati
 def select_schoolkid(schoolkid_name: str):
     try:
         schoolkid = Schoolkid.objects.get(full_name__contains=schoolkid_name)
+        print(f"Выбран ученик {schoolkid.year_of_study}{schoolkid.group_letter} класса {schoolkid.full_name}.")
         return schoolkid
     except Schoolkid.DoesNotExist:
         print("Такого ученика не существует, либо ФИО указано неверно.")
@@ -25,32 +26,33 @@ def remove_chastisements(schoolkid: Schoolkid):
 
 
 def create_commendation(schoolkid: Schoolkid, subject_title: str):
-    subject = Subject.objects.get(title=subject_title, year_of_study=schoolkid.year_of_study)
+    try:
+        subject = Subject.objects.get(title=subject_title.title(), year_of_study=schoolkid.year_of_study)
+        lessons = Lesson.objects.filter(
+            year_of_study=schoolkid.year_of_study,
+            group_letter=schoolkid.group_letter,
 
-    lessons = Lesson.objects.filter(
-        year_of_study=schoolkid.year_of_study,
-        group_letter=schoolkid.group_letter,
+        )
+        lesson = random.choice(lessons)
+        while True:
+            try:
+                Commendation.objects.get(
+                    schoolkid=schoolkid,
+                    created=lesson.date,
+                    subject=subject)
+                lesson = random.choice(lessons)
+            except Commendation.DoesNotExist:
+                break
 
-    )
-    lesson = random.choice(lessons)
-    while True:
-        try:
-            Commendation.objects.get(
-                schoolkid=schoolkid,
-                created=lesson.date,
-                subject=subject)
-            lesson = random.choice(lessons)
-        except Commendation.DoesNotExist:
-            break
+        texts = Commendation.objects.filter(subject=subject)
+        comm_text = random.choice(texts).text
 
-    texts = Commendation.objects.filter(subject=subject)
-    comm_text = random.choice(texts).text
-
-    Commendation.objects.create(
-        text=comm_text,
-        schoolkid=schoolkid,
-        subject=subject,
-        teacher=lesson.teacher,
-        created=lesson.date
-
-    )
+        Commendation.objects.create(
+            text=comm_text,
+            schoolkid=schoolkid,
+            subject=subject,
+            teacher=lesson.teacher,
+            created=lesson.date
+        )
+    except Subject.DoesNotExist:
+        print("Название предмета введено неверно или такого предмета не существует.")
