@@ -30,6 +30,9 @@ def create_commendation(schoolkid: Schoolkid, subject_title: str):
             group_letter=schoolkid.group_letter,
 
         )
+        if not lessons:
+            raise Lesson.EmptyResultSet
+        
         lesson = random.choice(lessons)
         while True:
             try:
@@ -53,3 +56,5 @@ def create_commendation(schoolkid: Schoolkid, subject_title: str):
         )
     except Subject.DoesNotExist:
         print("Название предмета введено неверно или такого предмета не существует.")
+    except Lesson.EmptyResultSet:
+        print("Не найдено уроков для выбранного ученика или его класса.")
