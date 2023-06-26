@@ -14,11 +14,7 @@ def select_schoolkid(schoolkid_name: str):
 
 
 def fix_marks(schoolkid: Schoolkid):
-    marks = Mark.objects.filter(schoolkid=schoolkid, points__lt=4)
-    if marks:
-        marks.update(points=5)
-    else:
-        print(f"Ученик {schoolkid.full_name} не имеет плохих оценок в дневнике, исправлять нечего.")
+    marks = Mark.objects.filter(schoolkid=schoolkid, points__lt=4).update(points=5)
 
 
 def remove_chastisements(schoolkid: Schoolkid):
