@@ -1,6 +1,18 @@
 import random
 from datacenter.models import Schoolkid, Mark, Chastisement, Subject, Commendation, Lesson
 
+TEXTS = ["Молодец!", "Отлично!", "Хорошо!", "Гораздо лучше, чем я ожидал!", 
+        "Ты меня приятно удивил!", "Великолепно!", "Прекрасно!", 
+        "Ты меня очень обрадовал!", "Именно этого я давно ждал от тебя!", 
+        "Сказано здорово – просто и ясно!", "Ты, как всегда, точен!", 
+        "Очень хороший ответ!", "Талантливо!", "Ты сегодня прыгнул выше головы!", 
+        "Я поражен!", "Уже существенно лучше!", "Потрясающе!", "Замечательно!", 
+        "Прекрасное начало!", "Так держать!", "Ты на верном пути!", "Здорово!", 
+        "Это как раз то, что нужно!", "Я тобой горжусь!", 
+        "С каждым разом у тебя получается всё лучше!", "Мы с тобой не зря поработали!", 
+        "Я вижу, как ты стараешься!", "Ты растешь над собой!", "Ты многое сделал, я это вижу!", 
+        "Теперь у тебя точно все получится!"]
+
 
 def select_schoolkid(schoolkid_name: str):
     try:
@@ -33,6 +45,7 @@ def create_commendation(schoolkid: Schoolkid, subject_title: str):
         if not lessons:
             raise Lesson.EmptyResultSet
         
+        # Поиск урока без похвалы
         lesson = random.choice(lessons)
         while True:
             try:
@@ -44,9 +57,7 @@ def create_commendation(schoolkid: Schoolkid, subject_title: str):
             except Commendation.DoesNotExist:
                 break
 
-        texts = Commendation.objects.filter(subject=subject)
-        comm_text = random.choice(texts).text
-
+        comm_text = random.choice(TEXTS)
         Commendation.objects.create(
             text=comm_text,
             schoolkid=schoolkid,
